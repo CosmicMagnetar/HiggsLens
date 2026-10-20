@@ -67,3 +67,4 @@ Excellence is not “the MLP must win.” Excellence means a well-framed questio
 - `docs/05_repo_and_notebook_workflow.md`: folder structure, GitHub, notebooks, and AI workflow.
 - `docs/06_experiment_protocol.md`: dataset, feature sets, splits, metrics, and analysis rules.
 - `docs/07_demo_and_viva.md`: demo storyline and viva preparation.
+- `docs/10_submission_checklists.md`: final mid-semester and end-semester evidence checks.

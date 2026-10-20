@@ -7,6 +7,7 @@ from typing import Any, Sequence
 
 import numpy as np
 from sklearn.metrics import (
+    accuracy_score,
     average_precision_score,
     brier_score_loss,
     confusion_matrix,
@@ -175,6 +176,7 @@ def summarize_at_threshold(
         "precision": float(precision_score(y, pred, zero_division=0)),
         "recall": float(recall_score(y, pred, zero_division=0)),
         "f1": float(f1_score(y, pred, zero_division=0)),
+        "accuracy": float(accuracy_score(y, pred)),
         "threshold": float(threshold),
     }
 
@@ -188,6 +190,7 @@ def ranking_metrics(y_true: Sequence[int], probabilities: Sequence[float]) -> di
     return {
         "roc_auc": float(roc_auc_score(y, p)),
         "average_precision": float(average_precision_score(y, p)),
+        "accuracy_at_0_5": float(accuracy_score(y, p >= 0.5)),
         "brier_score": float(brier_score_loss(y, p)),
         "log_loss": float(log_loss(y, p, labels=[0, 1])),
         "prevalence": float(np.mean(y)),

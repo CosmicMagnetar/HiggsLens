@@ -3,7 +3,14 @@ import pandas as pd
 import pytest
 
 from higgslens.artifacts import matching_models, validate_prediction_frame
-from higgslens.core import FEATURE_GROUPS, evaluate_frozen_candidate, make_subset_split, validate_higgs_array
+from higgslens.core import (
+    FEATURE_GROUPS,
+    evaluate_frozen_candidate,
+    make_subset_split,
+    ranking_metrics,
+    summarize_at_threshold,
+    validate_higgs_array,
+)
 
 
 def valid_raw(rows=20):
@@ -57,6 +64,13 @@ def test_final_evaluation_preserves_validation_selected_threshold():
     assert result["threshold_selection"]["split"] == "validation"
     assert result["test_metrics"]["threshold"] == result["threshold_selection"]["threshold"]
     assert result["test_metrics"]["recall"] >= 0
+
+
+def test_accuracy_is_available_at_fixed_and_operating_thresholds():
+    labels = [0, 0, 1, 1]
+    probabilities = [0.1, 0.8, 0.6, 0.3]
+    assert ranking_metrics(labels, probabilities)["accuracy_at_0_5"] == pytest.approx(0.5)
+    assert summarize_at_threshold(labels, probabilities, 0.5)["accuracy"] == pytest.approx(0.5)
 
 
 def test_prediction_artifact_validation_and_model_match():

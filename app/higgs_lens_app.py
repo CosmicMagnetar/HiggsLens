@@ -40,6 +40,9 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 [data-testid="stDataFrame"] { border:1px solid var(--line); }
 .method-note { border-left:4px solid var(--red); background:#fff5f0; padding:.75rem 1rem; color:#523135; margin:.5rem 0 1.2rem; }
 .status-ok { display:inline-block; background:#dff0e6; color:#145a32; border-radius:99px; padding:.28rem .7rem; font-family:'DM Mono', monospace; font-size:.72rem; }
+.masthead, [data-testid="stMetric"] { animation:settle .55s cubic-bezier(.2,.8,.2,1) both; }
+[data-testid="stMetric"]:hover { transform:translateY(-3px); box-shadow:0 11px 22px rgba(18,35,59,.10); transition:transform .18s ease, box-shadow .18s ease; }
+@keyframes settle { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 @media (max-width: 700px) { .masthead h1 { font-size:3rem; } .dek { font-size:1rem; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation:none !important; transition:none !important; } }
 </style>
@@ -72,6 +75,7 @@ def metric_table(frame: pd.DataFrame) -> pd.DataFrame:
         columns={
             "roc_auc": "ROC-AUC",
             "average_precision": "Average precision",
+            "accuracy_at_0_5": "Accuracy at 0.50",
             "brier_score": "Brier score",
             "log_loss": "Log loss",
             "prevalence": "Signal prevalence",
@@ -140,6 +144,7 @@ with development_tab:
             {
                 "ROC-AUC": "{:.4f}",
                 "Average precision": "{:.4f}",
+                "Accuracy at 0.50": "{:.2%}",
                 "Brier score": "{:.4f}",
                 "Log loss": "{:.4f}",
                 "Signal prevalence": "{:.2%}",
@@ -162,6 +167,9 @@ with development_tab:
     numbers[1].metric("Signal efficiency", f"{operating_metrics['signal_efficiency']:.1%}")
     numbers[2].metric("Background rejection", f"{operating_metrics['background_rejection']:.1%}")
     numbers[3].metric("Precision", f"{operating_metrics['precision']:.1%}")
+    st.caption(
+        "Accuracy at 0.50 is secondary context. The cards above use the validation-selected operating threshold."
+    )
     st.download_button(
         "Download validation comparison",
         table.to_csv(index=False).encode("utf-8"),
@@ -200,12 +208,13 @@ with final_tab:
                 f"{freeze['model']} - threshold chosen on validation for {float(freeze['target_recall']):.0%} signal efficiency."
             )
             result = final["test_metrics"]
-            summary = st.columns(5)
+            summary = st.columns(6)
             summary[0].metric("ROC-AUC", f"{result['roc_auc']:.4f}")
             summary[1].metric("Average precision", f"{result['average_precision']:.4f}")
             summary[2].metric("Signal efficiency", f"{result['signal_efficiency']:.1%}")
             summary[3].metric("Background rejection", f"{result['background_rejection']:.1%}")
             summary[4].metric("F1", f"{result['f1']:.3f}")
+            summary[5].metric("Accuracy", f"{result['accuracy']:.1%}")
             left, right = st.columns(2)
             yt, pt = test["label"], test[freeze["model"]]
             with left:

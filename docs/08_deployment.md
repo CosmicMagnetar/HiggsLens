@@ -4,6 +4,16 @@ HiggsLens can be deployed as a Streamlit dashboard for reviewing saved benchmark
 
 ## Build and run locally
 
+The quickest review path uses the checked-in Compose definition. It mounts the synthetic smoke artifacts so the page starts with representative, explicitly non-HIGGS results:
+
+```bash
+docker compose up --build
+```
+
+Open `http://localhost:8501`. Replace `./outputs/smoke` in `compose.yml` with the path to a completed benchmark run before using the dashboard to review real results.
+
+For an explicit image name and a specific artifact directory, use Docker directly:
+
 ```bash
 docker build -t higgslens .
 docker run --rm -p 8501:8501 \

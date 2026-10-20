@@ -1,0 +1,8 @@
+services:
+  dashboard:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./outputs/smoke:/app/higgs_project_outputs:ro
+    restart: unless-stopped

@@ -69,7 +69,13 @@ The dashboard loads saved artifacts; it does not retrain models. Its development
 
 ## Dashboard deployment
 
-The repository includes a container definition for the artifact-review dashboard. Build it with `docker build -t higgslens .`, then mount a completed run directory at `/app/higgs_project_outputs` when starting the container. Full commands and hosting notes are in [docs/08_deployment.md](docs/08_deployment.md). The dashboard is a research-review tool for simulated benchmark outputs, not a live particle detector or discovery service.
+The repository includes a container definition and a one-command Compose launch for the artifact-review dashboard:
+
+```bash
+docker compose up --build
+```
+
+This starts the app at `http://localhost:8501` with the synthetic smoke artifacts so the interface can be reviewed immediately. For a real benchmark review, change the one volume source in `compose.yml` from `./outputs/smoke` to the completed run directory. Full commands and hosting notes are in [docs/08_deployment.md](docs/08_deployment.md). The dashboard is a research-review tool for simulated benchmark outputs, not a live particle detector or discovery service.
 
 ## Academic protocol and caveats
 
