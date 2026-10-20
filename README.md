@@ -23,6 +23,20 @@ The reusable package now provides strict schema checks, deterministic 64/16/20 s
 python -m higgslens.smoke
 ```
 
+## Run the benchmark from a local HIGGS file
+
+The runnable model implementations live in `src/higgslens/models.py`: scaled Logistic Regression, histogram XGBoost with validation early stopping, and a compact PyTorch MLP with batch normalization, dropout, weight decay, and best-checkpoint restoration. Each runs against the low-level, high-level, and all-feature groups.
+
+```bash
+python -m higgslens.benchmark \
+  --data data/raw/HIGGS.csv.gz \
+  --output outputs/subset_250k_seed42 \
+  --rows 250000 \
+  --seed 42
+```
+
+The command reads only a local official file. It does not download data or substitute a mirror. It writes configuration, metadata, validation predictions, final-test predictions, and a results table under the supplied output directory. Use `--without-xgboost` or `--without-mlp` only for a dependency smoke test; such a run is not the complete required matrix.
+
 ## Run in Colab
 
 1. Open https://colab.research.google.com/.

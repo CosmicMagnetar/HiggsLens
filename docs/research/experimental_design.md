@@ -1,4 +1,4 @@
-# HiggsLens experimental design
+# HiggsLens experiment design
 
 ## Protocols
 
@@ -8,7 +8,7 @@
 
 Validate 29 finite numeric columns before extracting label, 28 feature columns after, binary labels with both classes in every partition, and non-overlapping/exhaustive row indices. Persist source, schema/order, sampling policy, split metadata, package versions, device, runtime and Git SHA.
 
-## Development → freeze → final evaluation
+## Development, freeze, final evaluation
 
 1. Develop only on training/validation. Fit scalers on train data; compare the predeclared model matrix on identical partition rows and feature groups.
 2. Freeze one declared candidate from validation ROC-AUC, its hyperparameters/seed/feature group, calibration decision, and validation-selected threshold for target recall 0.80.
@@ -16,8 +16,8 @@ Validate 29 finite numeric columns before extracting label, 28 feature columns a
 
 The dashboard accepts validation-only development artifacts. It exposes test metrics only when metadata names `frozen_candidate.model` and `frozen_candidate.target_recall`.
 
-## Predeclared candidate budget
+## Candidate matrix and budget
 
-Run Logistic Regression (`StandardScaler` + `LogisticRegression`, solver/`C` recorded), XGBoost histogram candidates (maximum 12 combinations across depth 3/5/7, learning rate 0.03/0.1, subsample/colsample 0.8/1.0, `min_child_weight`, `reg_lambda`; validation early stopping), and a compact PyTorch MLP (two 128-unit layers, batch norm, ReLU, dropout, weight decay, patience and minimum delta recorded). Each must cover `low_level`, `high_level`, and `all_features`; omissions are [NOT RUN] rather than silently removed.
+The baseline matrix is Logistic Regression (`StandardScaler` + `LogisticRegression`), XGBoost histogram trees with validation early stopping, and a compact PyTorch MLP with two 128-unit hidden layers, batch normalization, dropout, and weight decay. Each model is run on `low_level`, `high_level`, and `all_features`. The runner records settings and validation metrics for every candidate, then freezes the highest validation ROC-AUC candidate before test scoring.
 
 Record preprocessing, fit, and repeated inference timing separately. Report milliseconds per 1,000 events; synchronize GPU timing if used and state batch size/device. Bootstrap final ROC-AUC and AP with a declared stratified repetition count (200 default in the helper) and seed. Use validation permutation importance for one frozen classical candidate, on a bounded subset.
