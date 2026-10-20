@@ -130,6 +130,47 @@ def train_xgboost(
     )
 
 
+def train_best_xgboost(
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    X_validation: np.ndarray,
+    y_validation: np.ndarray,
+    feature_group: str,
+    seed: int,
+) -> TrainedCandidate:
+    """Choose from three fixed tree configurations using validation ROC-AUC only."""
+    presets = (
+        {"max_depth": 3, "learning_rate": 0.05, "min_child_weight": 1.0, "reg_lambda": 1.0},
+        {"max_depth": 5, "learning_rate": 0.05, "min_child_weight": 1.0, "reg_lambda": 1.0},
+        {"max_depth": 6, "learning_rate": 0.03, "min_child_weight": 3.0, "reg_lambda": 2.0},
+    )
+    trials = [
+        train_xgboost(
+            X_train,
+            y_train,
+            X_validation,
+            y_validation,
+            feature_group,
+            seed,
+            parameters=preset,
+        )
+        for preset in presets
+    ]
+    selected = max(trials, key=lambda trial: trial.details["validation"]["roc_auc"])
+    selected.details["parameter_trials"] = [
+        {
+            "max_depth": trial.details["max_depth"],
+            "learning_rate": trial.details["learning_rate"],
+            "min_child_weight": trial.details["min_child_weight"],
+            "reg_lambda": trial.details["reg_lambda"],
+            "best_iteration": trial.details["best_iteration"],
+            "validation_roc_auc": trial.details["validation"]["roc_auc"],
+        }
+        for trial in trials
+    ]
+    return selected
+
+
 def train_compact_mlp(
     X_train: np.ndarray,
     y_train: np.ndarray,

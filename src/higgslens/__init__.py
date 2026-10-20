@@ -15,6 +15,7 @@ from .core import (
 from .models import (
     feature_indices,
     train_best_compact_mlp,
+    train_best_xgboost,
     train_compact_mlp,
     train_logistic_regression,
     train_xgboost,
@@ -33,6 +34,7 @@ __all__ = [
     "validate_higgs_array",
     "feature_indices",
     "train_best_compact_mlp",
+    "train_best_xgboost",
     "train_compact_mlp",
     "train_logistic_regression",
     "train_xgboost",

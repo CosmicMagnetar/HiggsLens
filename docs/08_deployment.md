@@ -15,7 +15,7 @@ Open `http://localhost:8501`. The mounted directory must include `val_prediction
 
 ## Hosted deployment
 
-Any container host that supports a single HTTP port can run the included `Dockerfile`. Set the service port to `8501`, mount or securely provide the artifact directory as read-only, and do not include the raw UCI dataset, credentials, or model-training outputs in the image.
+Any container host that supports a single HTTP port can run the included `Dockerfile`. Set the service port to `8501`, mount or securely provide the artifact directory as read-only, and do not include the raw UCI dataset, credentials, or model-training outputs in the image. The image uses the smaller dashboard dependency set; full training remains a separate local or compute-job concern.
 
 Before publishing, build the image locally or in CI and load a small synthetic artifact set. This repository does not contain cloud credentials or a configured hosting target, so it cannot create a public deployment by itself.
 

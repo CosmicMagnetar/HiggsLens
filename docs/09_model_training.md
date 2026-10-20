@@ -5,7 +5,7 @@ HiggsLens uses the same train, validation, and test rows for all model families 
 ## Models included
 
 - Logistic Regression is the scaled linear baseline.
-- XGBoost uses histogram trees and validation-based early stopping.
+- XGBoost uses histogram trees, validation-based early stopping, and three fixed depth/learning-rate/regularization presets. The best preset is selected from validation ROC-AUC and its trials are saved in run metadata.
 - The compact MLP has two 128-unit layers, batch normalization, ReLU activations, dropout, weight decay, gradient clipping, and early stopping.
 
 The MLP runner compares AdamW and AdaGrad over the same bounded setup. It keeps the optimizer with the strongest validation ROC-AUC for that feature group, records both trials in the run metadata, and restores the corresponding checkpoint. This is a model-development comparison, not a test-set competition.

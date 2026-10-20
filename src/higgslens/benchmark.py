@@ -22,8 +22,8 @@ from .models import (
     TrainedCandidate,
     feature_indices,
     train_best_compact_mlp,
+    train_best_xgboost,
     train_logistic_regression,
-    train_xgboost,
 )
 
 
@@ -74,7 +74,9 @@ def run_subset_benchmark(
             train_logistic_regression(X[train], y[train], X[validation], y[validation], group, seed)
         )
         if include_xgboost:
-            candidates.append(train_xgboost(X[train], y[train], X[validation], y[validation], group, seed))
+            candidates.append(
+                train_best_xgboost(X[train], y[train], X[validation], y[validation], group, seed)
+            )
         if include_mlp:
             candidates.append(
                 train_best_compact_mlp(

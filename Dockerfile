@@ -8,10 +8,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
 
 COPY pyproject.toml README.md ./
-COPY requirements-app.txt ./
+COPY requirements-dashboard.txt ./
 COPY src ./src
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir . -r requirements-app.txt
+    && pip install --no-cache-dir . -r requirements-dashboard.txt
 
 COPY app ./app
 
