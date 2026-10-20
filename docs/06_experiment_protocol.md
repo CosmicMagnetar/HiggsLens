@@ -36,7 +36,7 @@ The dataset fields are numeric representations, not raw detector images. `pt` de
 
 ## Splitting and leakage prevention
 
-For a subset MVP, use a fixed stratified train/validation/test split such as 64%/16%/20%. For the stronger end-sem study, keep the same named policy across candidates, with a sufficiently large held-out test set. The exact split is less important than fixing it before model comparison and documenting it.
+For a subset MVP, use the fixed named `subset_stratified_64_16_20` policy: a stratified 64%/16%/20% split with seed recorded (default 42). For the stronger end-sem study, keep the same named policy across candidates, with a sufficiently large held-out test set. Record whether the development pool is a contiguous official-file prefix or a seeded sample; do not call it the official protocol.
 
 1. Split labels and features into train/validation/test partitions.
 2. Fit scaling on training rows only.
@@ -46,7 +46,7 @@ For a subset MVP, use a fixed stratified train/validation/test split such as 64%
 6. Choose the operating threshold using validation data only.
 7. Evaluate the frozen chosen configuration and threshold on test data.
 
-If the team later implements the original published HIGGS protocol, preserve the original final 500,000 rows as a separate test set. This needs the complete source dataset and extra disk/runtime; label the run accordingly. Do not claim to have used this official split for a simple random split from the first 250k rows.
+For the optional `full_official_last_500k` protocol, preserve source-order rows 10,500,001–11,000,000 as the final test set and split only the preceding development rows. This needs the complete source dataset and extra disk/runtime; label the run accordingly. Do not claim to have used this official split for a simple random split from the first 250k rows.
 
 ## Model matrix
 
@@ -54,7 +54,7 @@ If the team later implements the original published HIGGS protocol, preserve the
 |---|---|---|
 | Logistic Regression | Low-level, high-level, all | StandardScaler fitted on training only |
 | XGBoost | Low-level, high-level, all | No standardization normally required for trees; use same rows/features and fixed settings |
-| MLP | Low-level and all as a minimum; high-level optional if budget permits | StandardScaler fitted on training only; batch normalization + dropout |
+| MLP | Low-level, high-level, all | StandardScaler fitted on training only; batch normalization + dropout |
 
 For the end-sem report, explain any omitted feature-set/model combination and why. Do not silently substitute another tree model: if XGBoost cannot be used and a fallback is necessary, label the fallback in all tables and figures.
 
@@ -88,13 +88,16 @@ Start with model coefficients (for Logistic Regression), permutation importance 
 
 ## Artifact contract
 
-Every run should save:
+Every run should save (under one run identifier):
 
 - `results.csv`
 - `val_predictions.csv`
 - `test_predictions.csv`
 - `run_metadata.json`
+- `experiment_config.json` with frozen-candidate settings before final scoring
 - `summary.md`
 - ROC, precision–recall, calibration and feature-importance plots if generated
 
 Use a separate output folder per run, e.g., `outputs/midsem_250k_seed42/` and `outputs/endsem_1m_seed42/`.
+
+The dashboard requires `run_metadata.json` to declare `frozen_candidate.model` and `frozen_candidate.target_recall` before it will reveal final-test metrics. Its development controls use validation data only.

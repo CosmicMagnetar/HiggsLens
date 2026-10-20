@@ -1,6 +1,6 @@
 # HiggsLens — Reproducible HIGGS Classification Benchmark
 
-HiggsLens compares Logistic Regression, XGBoost and a compact MLP on the UCI HIGGS simulated-event dataset. It separates the mid-semester MVP from the more rigorous end-semester benchmark and adds an exploratory Streamlit dashboard.
+HiggsLens compares Logistic Regression, XGBoost and a compact MLP on the UCI HIGGS simulated-event dataset. It separates the mid-semester MVP from the more rigorous end-semester benchmark and adds an artifact-based Streamlit dashboard.
 
 ## Read in this order
 
@@ -16,6 +16,12 @@ HiggsLens compares Logistic Regression, XGBoost and a compact MLP on the UCI HIG
 - `notebooks/02_endsem_benchmark.ipynb`: same documented pipeline with a 1,000,000-row target and longer training settings.
 
 Both notebook versions use Markdown explanation cells before analytical code. Code cells are intentionally free of explanatory comments. The notebooks fit preprocessing on training data, use validation to choose candidates and thresholds, assess on a held-out test set, and save outputs. They do not silently switch to a smaller third-party mirror.
+
+The reusable package now provides strict schema checks, deterministic 64/16/20 subset splits, validation-only threshold selection, frozen final evaluation, bootstrap helpers and artifact validation. The CPU-only smoke run creates synthetic artifacts and **is not a HIGGS benchmark**:
+
+```bash
+python -m higgslens.smoke
+```
 
 ## Run in Colab
 
@@ -43,7 +49,7 @@ On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1`. Python 3.10+ 
 
 ## Run the app
 
-The dashboard loads saved artifacts; it does not retrain models by default. Point it at the output folder created by the notebook. The threshold decision is based on validation scores and is transferred unchanged to test data.
+The dashboard loads saved artifacts; it does not retrain models. Its development explorer reads validation predictions only. It shows final-test metrics only when `run_metadata.json` declares the frozen model and target recall, so slider interaction cannot become a test-set threshold-tuning loop.
 
 ## Academic protocol and caveats
 
@@ -51,6 +57,7 @@ The dashboard loads saved artifacts; it does not retrain models by default. Poin
 - Report sample size, data source, seed, split, runtime, model settings and actual results.
 - The dataset is simulated Monte Carlo data. Do not call this a discovery, a detector deployment or a real-world probability estimate.
 - A real sensitivity/significance calculation needs physics inputs absent from the simple feature table.
+- See `docs/research/experimental_design.md` for the subset and full-data protocols, and `reports/final/benchmark_report.md` for the current evidence status.
 
 ## Sources
 

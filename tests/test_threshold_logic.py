@@ -1,5 +1,7 @@
 import unittest
+
 import numpy as np
+
 from higgslens.core import select_threshold_for_recall, summarize_at_threshold
 
 
@@ -9,9 +11,9 @@ class ThresholdLogicTests(unittest.TestCase):
         p = np.array([0.05, 0.15, 0.25, 0.60, 0.45, 0.70, 0.80, 0.95])
         threshold = select_threshold_for_recall(y, p, 0.75)
         summary = summarize_at_threshold(y, p, threshold)
-        self.assertGreaterEqual(summary['signal_efficiency'], 0.75)
-        self.assertGreaterEqual(summary['background_rejection'], 0.0)
-        self.assertLessEqual(summary['background_rejection'], 1.0)
+        self.assertGreaterEqual(summary["signal_efficiency"], 0.75)
+        self.assertGreaterEqual(summary["background_rejection"], 0.0)
+        self.assertLessEqual(summary["background_rejection"], 1.0)
 
     def test_invalid_probability_is_rejected(self):
         with self.assertRaises(ValueError):
@@ -26,5 +28,5 @@ class ThresholdLogicTests(unittest.TestCase):
             select_threshold_for_recall([1, 1, 1], [0.2, 0.5, 0.9], 0.8)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

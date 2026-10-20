@@ -25,5 +25,6 @@ higgs_project_outputs.zip
 *.pth
 *.pkl
 *.joblib
+*.egg-info/
 .DS_Store
 .env
