@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Notebooks: omit transient checkpoints, not source notebooks
+.ipynb_checkpoints/
+
+# Raw/derived data and generated outputs
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+outputs/*
+!outputs/.gitkeep
+reports/figures/*
+!reports/figures/.gitkeep
+*.csv.gz
+HIGGS.csv
+HIGGS.csv.gz
+higgs_project_outputs.zip
+*.pt
+*.pth
+*.pkl
+*.joblib
+.DS_Store
+.env

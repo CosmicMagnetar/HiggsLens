@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "Please cite the HIGGS dataset and the original research paper as described in docs/06_experiment_protocol.md."
+title: "HiggsLens: Reproducible ML Benchmark for Simulated Higgs-Event Classification"
+type: software
+version: 0.1.0
+date-released: 2026-10-20
+authors:
+  - family-names: Krishna
+    given-names: Project lead
