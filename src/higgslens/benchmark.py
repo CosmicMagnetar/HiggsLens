@@ -21,7 +21,7 @@ from .core import (
 from .models import (
     TrainedCandidate,
     feature_indices,
-    train_compact_mlp,
+    train_best_compact_mlp,
     train_logistic_regression,
     train_xgboost,
 )
@@ -58,6 +58,7 @@ def run_subset_benchmark(
     seed: int = 42,
     include_xgboost: bool = True,
     include_mlp: bool = True,
+    mlp_optimizers: tuple[str, ...] = ("adamw", "adagrad"),
 ) -> dict[str, Any]:
     """Run the fixed 3-model × 3-feature-group matrix on a validated subset.
 
@@ -76,7 +77,15 @@ def run_subset_benchmark(
             candidates.append(train_xgboost(X[train], y[train], X[validation], y[validation], group, seed))
         if include_mlp:
             candidates.append(
-                train_compact_mlp(X[train], y[train], X[validation], y[validation], group, seed)
+                train_best_compact_mlp(
+                    X[train],
+                    y[train],
+                    X[validation],
+                    y[validation],
+                    group,
+                    seed,
+                    mlp_optimizers,
+                )
             )
     selected = max(candidates, key=lambda item: item.details["validation"]["roc_auc"])
     output = Path(output_dir)
@@ -131,10 +140,23 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--without-xgboost", action="store_true")
     parser.add_argument("--without-mlp", action="store_true")
+    parser.add_argument(
+        "--mlp-optimizers",
+        default="adamw,adagrad",
+        help="Comma-separated bounded MLP development trials; default: adamw,adagrad",
+    )
     args = parser.parse_args()
     X, y = load_local_higgs(args.data, args.rows)
     raw = np.column_stack((y, X))
-    run_subset_benchmark(raw, args.output, args.seed, not args.without_xgboost, not args.without_mlp)
+    optimizer_names = tuple(name.strip().lower() for name in args.mlp_optimizers.split(",") if name.strip())
+    run_subset_benchmark(
+        raw,
+        args.output,
+        args.seed,
+        not args.without_xgboost,
+        not args.without_mlp,
+        optimizer_names,
+    )
 
 
 if __name__ == "__main__":

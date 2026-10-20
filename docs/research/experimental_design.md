@@ -18,6 +18,6 @@ The dashboard accepts validation-only development artifacts. It exposes test met
 
 ## Candidate matrix and budget
 
-The baseline matrix is Logistic Regression (`StandardScaler` + `LogisticRegression`), XGBoost histogram trees with validation early stopping, and a compact PyTorch MLP with two 128-unit hidden layers, batch normalization, dropout, and weight decay. Each model is run on `low_level`, `high_level`, and `all_features`. The runner records settings and validation metrics for every candidate, then freezes the highest validation ROC-AUC candidate before test scoring.
+The baseline matrix is Logistic Regression (`StandardScaler` + `LogisticRegression`), XGBoost histogram trees with validation early stopping, and a compact PyTorch MLP with two 128-unit hidden layers, batch normalization, dropout, gradient clipping, and weight decay. Each model is run on `low_level`, `high_level`, and `all_features`. The MLP compares AdamW and AdaGrad as a small, declared validation-only trial. The runner records settings and validation metrics for every candidate, then freezes the highest validation ROC-AUC candidate before test scoring.
 
 Record preprocessing, fit, and repeated inference timing separately. Report milliseconds per 1,000 events; synchronize GPU timing if used and state batch size/device. Bootstrap final ROC-AUC and AP with a declared stratified repetition count (200 default in the helper) and seed. Use validation permutation importance for one frozen classical candidate, on a bounded subset.

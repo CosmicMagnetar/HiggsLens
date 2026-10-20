@@ -37,6 +37,8 @@ python -m higgslens.benchmark \
 
 The command reads only a local official file. It does not download data or substitute a mirror. It writes configuration, metadata, validation predictions, final-test predictions, and a results table under the supplied output directory. Use `--without-xgboost` or `--without-mlp` only for a dependency smoke test; such a run is not the complete required matrix.
 
+Training choices, including the bounded AdamW/AdaGrad MLP comparison, are described in [docs/09_model_training.md](docs/09_model_training.md).
+
 ## Run in Colab
 
 1. Open https://colab.research.google.com/.
@@ -64,6 +66,10 @@ On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1`. Python 3.10+ 
 ## Run the app
 
 The dashboard loads saved artifacts; it does not retrain models. Its development explorer reads validation predictions only. It shows final-test metrics only when `run_metadata.json` declares the frozen model and target recall, so slider interaction cannot become a test-set threshold-tuning loop.
+
+## Dashboard deployment
+
+The repository includes a container definition for the artifact-review dashboard. Build it with `docker build -t higgslens .`, then mount a completed run directory at `/app/higgs_project_outputs` when starting the container. Full commands and hosting notes are in [docs/08_deployment.md](docs/08_deployment.md). The dashboard is a research-review tool for simulated benchmark outputs, not a live particle detector or discovery service.
 
 ## Academic protocol and caveats
 

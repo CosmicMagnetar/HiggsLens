@@ -12,7 +12,13 @@ from .core import (
     summarize_at_threshold,
     validate_higgs_array,
 )
-from .models import feature_indices, train_compact_mlp, train_logistic_regression, train_xgboost
+from .models import (
+    feature_indices,
+    train_best_compact_mlp,
+    train_compact_mlp,
+    train_logistic_regression,
+    train_xgboost,
+)
 
 __all__ = [
     "FEATURE_GROUPS",
@@ -26,6 +32,7 @@ __all__ = [
     "summarize_at_threshold",
     "validate_higgs_array",
     "feature_indices",
+    "train_best_compact_mlp",
     "train_compact_mlp",
     "train_logistic_regression",
     "train_xgboost",

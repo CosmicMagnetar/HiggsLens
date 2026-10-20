@@ -1,0 +1,12 @@
+.git
+.venv
+__pycache__
+*.py[cod]
+data/raw
+data/processed
+outputs
+reports/figures
+*.pt
+*.pth
+*.joblib
+.env

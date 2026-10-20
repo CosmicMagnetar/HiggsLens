@@ -140,8 +140,11 @@ def train_compact_mlp(
     epochs: int = 100,
     patience: int = 12,
     batch_size: int = 512,
+    optimizer_name: str = "adamw",
+    learning_rate: float = 1e-3,
+    weight_decay: float = 1e-4,
 ) -> TrainedCandidate:
-    """Fit a compact regularized PyTorch MLP and restore its best validation state."""
+    """Fit a compact MLP and restore the checkpoint selected by validation AUC."""
     try:
         import torch
         from torch import nn
@@ -177,7 +180,16 @@ def train_compact_mlp(
             return self.network(values).squeeze(1)
 
     model = CompactMLP().to(device)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    optimizers = {
+        "adamw": lambda: torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay),
+        "adagrad": lambda: torch.optim.Adagrad(
+            model.parameters(), lr=learning_rate, weight_decay=weight_decay
+        ),
+    }
+    if optimizer_name not in optimizers:
+        raise ValueError(f"unknown MLP optimizer {optimizer_name!r}; choose from {sorted(optimizers)}")
+    optimizer = optimizers[optimizer_name]()
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
     loss_function = nn.BCEWithLogitsLoss()
     loader = DataLoader(
         TensorDataset(torch.from_numpy(train_x), torch.from_numpy(y_train.astype(np.float32))),
@@ -195,8 +207,10 @@ def train_compact_mlp(
             optimizer.zero_grad()
             loss = loss_function(model(batch_x.to(device)), batch_y.to(device))
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)
             optimizer.step()
             total_loss += float(loss.detach().cpu()) * len(batch_y)
+        scheduler.step()
         model.eval()
         with torch.no_grad():
             validation_p = torch.sigmoid(model(validation_tensor)).cpu().numpy()
@@ -226,6 +240,10 @@ def train_compact_mlp(
         validation_probabilities=probabilities,
         fit_seconds=fit_seconds,
         details={
+            "optimizer": optimizer_name,
+            "learning_rate": learning_rate,
+            "weight_decay": weight_decay,
+            "scheduler": "CosineAnnealingLR",
             "epochs_requested": epochs,
             "selected_epoch": best_epoch,
             "patience": patience,
@@ -235,3 +253,39 @@ def train_compact_mlp(
             "validation": ranking_metrics(y_validation, probabilities),
         },
     )
+
+
+def train_best_compact_mlp(
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    X_validation: np.ndarray,
+    y_validation: np.ndarray,
+    feature_group: str,
+    seed: int,
+    optimizer_names: tuple[str, ...] = ("adamw", "adagrad"),
+) -> TrainedCandidate:
+    """Run a bounded optimizer comparison and retain the validation winner."""
+    if not optimizer_names:
+        raise ValueError("at least one MLP optimizer must be supplied")
+    trials = [
+        train_compact_mlp(
+            X_train,
+            y_train,
+            X_validation,
+            y_validation,
+            feature_group,
+            seed,
+            optimizer_name=optimizer,
+        )
+        for optimizer in optimizer_names
+    ]
+    selected = max(trials, key=lambda trial: trial.details["validation"]["roc_auc"])
+    selected.details["optimizer_trials"] = [
+        {
+            "optimizer": trial.details["optimizer"],
+            "validation_roc_auc": trial.details["validation"]["roc_auc"],
+            "selected_epoch": trial.details["selected_epoch"],
+        }
+        for trial in trials
+    ]
+    return selected
